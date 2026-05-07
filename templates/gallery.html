@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block title %}Gallery — Vyakta{% endblock %}
+
+{% block extra_styles %}
+.gallery-page { padding: 48px 0 80px; }
+.gallery-header {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-bottom: 32px; flex-wrap: wrap; gap: 16px;
+}
+.gallery-header h1 {
+  font-family: 'Sora', sans-serif;
+  font-size: 34px; font-weight: 700; letter-spacing: -1px;
+}
+.gallery-header p { font-size: 15px; color: var(--text2); margin-top: 6px; }
+
+.filter-bar {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px;
+}
+.filter-btn {
+  padding: 8px 18px; border-radius: var(--radius-pill);
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text2); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.filter-btn:hover, .filter-btn.active {
+  background: rgba(124,106,255,0.12);
+  border-color: rgba(124,106,255,0.3);
+  color: var(--accent);
+}
+
+.reels-masonry {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+.reel-item {
+  border-radius: 14px; overflow: hidden;
+  aspect-ratio: 9/16;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  position: relative; cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.reel-item:hover { transform: scale(1.04); box-shadow: 0 16px 40px rgba(0,0,0,0.4); }
+.reel-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.reel-bg {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--surface2), #1a1830);
+  color: var(--text3); font-size: 36px;
+}
+.reel-overlay {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 30px 12px 14px;
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+  opacity: 0; transition: opacity 0.3s;
+}
+.reel-item:hover .reel-overlay { opacity: 1; }
+.reel-play-btn {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 46px; height: 46px; border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 16px;
+  opacity: 0; transition: opacity 0.3s;
+}
+.reel-item:hover .reel-play-btn { opacity: 1; }
+.reel-title { font-size: 13px; font-weight: 500; color: white; margin-bottom: 6px; }
+.reel-stats-row { display: flex; gap: 12px; }
+.rs { display: flex; align-items: center; gap: 5px; font-size: 12px; color: rgba(255,255,255,0.65); }
+
+.empty-gallery {
+  text-align: center; padding: 80px 20px;
+  color: var(--text3);
+}
+.empty-gallery i { font-size: 56px; margin-bottom: 20px; display: block; }
+.empty-gallery h2 { font-size: 22px; font-weight: 600; color: var(--text2); margin-bottom: 10px; }
+.empty-gallery p { font-size: 15px; margin-bottom: 28px; }
+
+/* Modal */
+.modal-backdrop {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.92); z-index: 999;
+  align-items: center; justify-content: center;
+}
+.modal-backdrop.open { display: flex; }
+.modal-inner { position: relative; width: 340px; }
+.modal-inner video { width: 100%; border-radius: 20px; max-height: 80vh; background: #000; }
+.modal-close {
+  position: absolute; top: -44px; right: 0;
+  background: none; border: none; color: white;
+  font-size: 30px; cursor: pointer; line-height: 1;
+}
+.modal-title { color: white; font-size: 14px; font-weight: 500; margin-top: 14px; text-align: center; opacity: 0.8; }
+{% endblock %}
+
+{% block content %}
+<section class="gallery-page">
+  <div class="container">
+    <div class="gallery-header">
+      <div>
+        <h1>Gallery</h1>
+        <p>All your AI-generated reels in one place</p>
+      </div>
+      <a href="{{ url_for('create') }}" class="btn btn-primary">
+        <i class="fa-solid fa-circle-plus"></i> New Reel
+      </a>
+    </div>
+
+    <div class="filter-bar">
+      <button class="filter-btn active">All</button>
+      <button class="filter-btn">Recent</button>
+      <button class="filter-btn">Most Liked</button>
+      <button class="filter-btn">Public</button>
+      <button class="filter-btn">Private</button>
+    </div>
+
+    {% if reels %}
+    <div class="reels-masonry">
+      {% for reel in reels %}
+      <div class="reel-item" onclick="openModal('{{ url_for('serve_reel', rec_id=reel.id) }}', '{{ reel.title }}')">
+
+        {% if reel.has_thumbnail %}
+          <img src="{{ reel.thumbnail_url }}" alt="{{ reel.title }}" />
+        {% else %}
+          <div class="reel-bg"><i class="fa-solid fa-clapperboard"></i></div>
+        {% endif %}
+
+        <div class="reel-play-btn"><i class="fa-solid fa-play"></i></div>
+
+        <div class="reel-overlay">
+          <div class="reel-title">{{ reel.title or 'Untitled Reel' }}</div>
+          <div class="reel-stats-row">
+            <div class="rs"><i class="fa-solid fa-heart"></i> 0</div>
+            <div class="rs"><i class="fa-solid fa-eye"></i> 0</div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-gallery">
+      <i class="fa-solid fa-film"></i>
+      <h2>No reels yet</h2>
+      <p>Create your first AI-powered reel and it'll appear here.</p>
+      <a href="{{ url_for('create') }}" class="btn btn-primary">
+        <i class="fa-solid fa-circle-plus"></i> Create your first reel
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Video Modal -->
+<div class="modal-backdrop" id="videoModal">
+  <div class="modal-inner">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <video id="modalVideo" controls autoplay playsinline></video>
+    <div class="modal-title" id="modalTitle"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  function openModal(videoUrl, title) {
+    document.getElementById('modalVideo').src = videoUrl;
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('videoModal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('modalVideo').src = '';
+    document.getElementById('videoModal').classList.remove('open');
+  }
+
+  document.getElementById('videoModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+  });
+</script>
+{% endblock %}

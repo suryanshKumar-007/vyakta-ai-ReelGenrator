@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Vyakta{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --surface2: #1c1c26;
+      --border: rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.12);
+      --accent: #7c6aff;
+      --accent2: #c45cff;
+      --accent-glow: rgba(124,106,255,0.25);
+      --pink: #ff5c8a;
+      --text: #f0eeff;
+      --text2: #9490b8;
+      --text3: #5a5675;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --radius-pill: 100px;
+    }
+ 
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+ 
+    /* Ambient background orbs */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -200px; left: -200px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(124,106,255,0.08) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -150px; right: -150px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(196,92,255,0.07) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+ 
+    /* ── Navbar ── */
+    .navbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      height: 62px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: 'Sora', sans-serif;
+      font-size: 22px; font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-decoration: none;
+    }
+    .nav-center { display: flex; gap: 8px; }
+    .nav-link {
+      display: flex; align-items: center; gap: 7px;
+      padding: 8px 16px; border-radius: var(--radius-pill);
+      color: var(--text2); font-size: 14px; font-weight: 500;
+      text-decoration: none; transition: all 0.2s;
+    }
+    .nav-link:hover, .nav-link.active {
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+    }
+    .nav-link.active { color: var(--accent); }
+    .nav-right { display: flex; align-items: center; gap: 14px; }
+    .nav-icon-btn {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text2); font-size: 15px;
+      cursor: pointer; text-decoration: none;
+      transition: all 0.2s;
+    }
+    .nav-icon-btn:hover { background: var(--surface2); color: var(--text); border-color: var(--border2); }
+    .nav-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--pink));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; color: white;
+      cursor: pointer; position: relative;
+    }
+    .nav-avatar::after {
+      content: '';
+      position: absolute; inset: -2px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--pink));
+      z-index: -1; opacity: 0.4;
+    }
+ 
+    /* ── Flash messages ── */
+    .flash-container { position: fixed; top: 80px; right: 20px; z-index: 999; display: flex; flex-direction: column; gap: 10px; }
+    .flash {
+      padding: 12px 20px; border-radius: var(--radius-sm);
+      font-size: 14px; font-weight: 500;
+      backdrop-filter: blur(10px);
+      animation: slideIn 0.3s ease;
+    }
+    .flash.success { background: rgba(0,220,130,0.15); border: 1px solid rgba(0,220,130,0.3); color: #00dc82; }
+    .flash.error { background: rgba(255,80,80,0.15); border: 1px solid rgba(255,80,80,0.3); color: #ff5050; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+ 
+    /* ── Utility classes ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 1; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: border-color 0.2s;
+    }
+    .card:hover { border-color: var(--border2); }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 11px 24px; border-radius: var(--radius-pill);
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+      cursor: pointer; text-decoration: none; border: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 8px 24px var(--accent-glow); }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--text2);
+    }
+    .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+    .tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 12px; border-radius: var(--radius-pill);
+      font-size: 12px; font-weight: 500;
+      background: rgba(124,106,255,0.12);
+      color: var(--accent);
+      border: 1px solid rgba(124,106,255,0.2);
+    }
+ 
+    {% block extra_styles %}
+    {% endblock %}
+  </style>
+</head>
+<body>
+ 
+  <nav class="navbar">
+    <a href="{{ url_for('home') }}" class="nav-logo">Vyakta</a>
+    <div class="nav-center">
+      <a href="{{ url_for('home') }}" class="nav-link {% if request.endpoint == 'home' %}active{% endif %}">
+        <i class="fa-solid fa-house-chimney"></i> Home
+      </a>
+      <a href="{{ url_for('gallery') }}" class="nav-link {% if request.endpoint == 'gallery' %}active{% endif %}">
+        <i class="fa-solid fa-film"></i> Gallery
+      </a>
+      <a href="{{ url_for('create') }}" class="nav-link {% if request.endpoint == 'create' %}active{% endif %}">
+        <i class="fa-solid fa-circle-plus"></i> Create
+      </a>
+    </div>
+    <div class="nav-right">
+      <a href="#" class="nav-icon-btn"><i class="fa-solid fa-magnifying-glass"></i></a>
+      <a href="#" class="nav-icon-btn"><i class="fa-regular fa-bell"></i></a>
+      <div class="nav-avatar">SY</div>
+    </div>
+  </nav>
+ 
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container">
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+ 
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+ 
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

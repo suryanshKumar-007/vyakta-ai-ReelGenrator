@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+{% block title %}Vyakta — AI Reels{% endblock %}
+ 
+{% block extra_styles %}
+.hero {
+  padding: 90px 0 60px;
+  text-align: center;
+  position: relative;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 16px; border-radius: var(--radius-pill);
+  background: rgba(124,106,255,0.1);
+  border: 1px solid rgba(124,106,255,0.2);
+  font-size: 13px; color: var(--accent); font-weight: 500;
+  margin-bottom: 28px;
+}
+.hero-eyebrow span { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.hero h1 {
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(40px, 7vw, 76px);
+  font-weight: 700; line-height: 1.05;
+  letter-spacing: -2px; margin-bottom: 24px;
+}
+.hero h1 .grad {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, var(--pink) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero p {
+  font-size: 18px; color: var(--text2); max-width: 520px;
+  margin: 0 auto 40px; line-height: 1.7;
+}
+.hero-actions { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+.btn-primary-lg {
+  padding: 14px 32px; font-size: 16px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white; border-radius: var(--radius-pill);
+  display: inline-flex; align-items: center; gap: 10px;
+  text-decoration: none; font-weight: 600;
+  transition: all 0.2s; border: none; cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-primary-lg:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(124,106,255,0.35); opacity: 0.95; }
+.btn-ghost-lg {
+  padding: 14px 32px; font-size: 16px;
+  border: 1px solid var(--border2);
+  color: var(--text); border-radius: var(--radius-pill);
+  display: inline-flex; align-items: center; gap: 10px;
+  text-decoration: none; font-weight: 500;
+  transition: all 0.2s; background: transparent; cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-ghost-lg:hover { background: var(--surface); transform: translateY(-2px); }
+ 
+/* Stats */
+.stats-bar {
+  display: flex; justify-content: center; gap: 60px;
+  padding: 32px 0; margin-top: 20px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.stat-item { text-align: center; }
+.stat-num { font-family: 'Sora', sans-serif; font-size: 28px; font-weight: 700; color: var(--text); }
+.stat-label { font-size: 13px; color: var(--text3); margin-top: 4px; }
+ 
+/* Features */
+.section-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 13px; font-weight: 600;
+  color: var(--accent); letter-spacing: 2px;
+  text-transform: uppercase; margin-bottom: 16px;
+}
+.section-heading {
+  font-family: 'Sora', sans-serif;
+  font-size: 36px; font-weight: 700;
+  letter-spacing: -1px; margin-bottom: 14px;
+}
+.features { padding: 80px 0; }
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px; margin-top: 48px;
+}
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  transition: all 0.3s;
+  position: relative; overflow: hidden;
+}
+.feature-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.feature-card:hover { border-color: rgba(124,106,255,0.3); transform: translateY(-4px); }
+.feature-card:hover::before { opacity: 1; }
+.feature-icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; margin-bottom: 18px;
+}
+.feature-icon.purple { background: rgba(124,106,255,0.15); color: var(--accent); }
+.feature-icon.pink { background: rgba(255,92,138,0.12); color: var(--pink); }
+.feature-icon.teal { background: rgba(0,220,130,0.1); color: #00dc82; }
+.feature-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 10px; }
+.feature-card p { font-size: 14px; color: var(--text2); line-height: 1.7; }
+ 
+/* Recent reels */
+.reels-section { padding: 0 0 80px; }
+.section-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 28px; }
+.reels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.reel-card {
+  border-radius: var(--radius);
+  overflow: hidden;
+  aspect-ratio: 9/16;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  position: relative; cursor: pointer;
+  transition: transform 0.3s;
+}
+.reel-card:hover { transform: scale(1.03); }
+.reel-thumb {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.reel-thumb-placeholder {
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, var(--surface2), #1a1830);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 12px; color: var(--text3);
+}
+.reel-thumb-placeholder i { font-size: 32px; }
+.reel-thumb-placeholder span { font-size: 12px; }
+.reel-overlay {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 20px 12px 14px;
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+  opacity: 0; transition: opacity 0.3s;
+}
+.reel-card:hover .reel-overlay { opacity: 1; }
+.reel-play {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.3s;
+  color: white; font-size: 16px;
+}
+.reel-card:hover .reel-play { opacity: 1; }
+.reel-meta { color: white; }
+.reel-meta p { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+.reel-stats { display: flex; gap: 12px; }
+.reel-stat { display: flex; align-items: center; gap: 5px; font-size: 12px; color: rgba(255,255,255,0.7); }
+.empty-state {
+  text-align: center; padding: 60px 20px;
+  color: var(--text3);
+}
+.empty-state i { font-size: 48px; margin-bottom: 16px; display: block; color: var(--text3); }
+.empty-state p { font-size: 15px; margin-bottom: 20px; }
+{% endblock %}
+ 
+{% block content %}
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">
+      <span></span>
+      AI-Powered Reel Generator
+    </div>
+    <h1>
+      Create <span class="grad">viral reels</span><br>in seconds
+    </h1>
+    <p>Upload your content and let AI transform it into cinematic, scroll-stopping reels your audience will love.</p>
+    <div class="hero-actions">
+      <a href="{{ url_for('create') }}" class="btn-primary-lg">
+        <i class="fa-solid fa-circle-plus"></i> Create a Reel
+      </a>
+      <a href="{{ url_for('gallery') }}" class="btn-ghost-lg">
+        <i class="fa-solid fa-film"></i> Browse Gallery
+      </a>
+    </div>
+  </div>
+</section>
+ 
+<div class="container">
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-num">10K+</div>
+      <div class="stat-label">Reels Created</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">2.4M</div>
+      <div class="stat-label">Total Views</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">98%</div>
+      <div class="stat-label">Satisfaction</div>
+    </div>
+  </div>
+</div>
+ 
+<section class="features">
+  <div class="container">
+    <div class="section-title">Why Vyakta</div>
+    <div class="section-heading">Everything you need</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon purple"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+        <h3>AI-Powered Generation</h3>
+        <p>Our AI analyzes your content and auto-generates captions, hashtags, and optimal cuts for maximum engagement.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon pink"><i class="fa-solid fa-music"></i></div>
+        <h3>Trending Audio</h3>
+        <p>Access thousands of trending tracks and sync your video perfectly to the beat with one click.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon teal"><i class="fa-solid fa-chart-line"></i></div>
+        <h3>Smart Analytics</h3>
+        <p>Track views, likes, and reach in real-time. Know exactly what's working and double down on it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+ 
+<section class="reels-section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Latest</div>
+        <div class="section-heading">Recent Reels</div>
+      </div>
+      <a href="{{ url_for('gallery') }}" class="btn btn-ghost">View all <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+ 
+    {% if reels %}
+      <div class="reels-grid">
+        {% for reel in reels[:8] %}
+        <div class="reel-card">
+          <div class="reel-thumb-placeholder">
+            <i class="fa-solid fa-clapperboard"></i>
+            <span>{{ reel.title or 'Reel' }}</span>
+          </div>
+          <div class="reel-play"><i class="fa-solid fa-play"></i></div>
+          <div class="reel-overlay">
+            <div class="reel-meta">
+              <p>{{ reel.title or 'Untitled' }}</p>
+              <div class="reel-stats">
+                <div class="reel-stat"><i class="fa-solid fa-heart"></i> 0</div>
+                <div class="reel-stat"><i class="fa-solid fa-eye"></i> 0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <i class="fa-solid fa-film"></i>
+        <p>No reels yet. Be the first to create one!</p>
+        <a href="{{ url_for('create') }}" class="btn btn-primary">
+          <i class="fa-solid fa-circle-plus"></i> Create Now
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+ 
